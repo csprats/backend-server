@@ -8,25 +8,7 @@
     {
       "id": "2",
       "user": "csvalley",
-      "message":"Is a public and simple chat"
-    }
-  ],
-  "online-game": [
-    {
-      "x": 50,
-      "y": 50
-    },
-    {
-      "x": 150,
-      "y": 50
-    },
-    {
-      "x": 250,
-      "y": 50
-    },
-    {
-      "x": 350,
-      "y": 50
+      "message":"Is a private and simple chat"
     }
   ]
 }

@@ -1,3 +1,4 @@
+import 'dotenv/config'; 
 import express, { response } from 'express';
 import { Pool } from 'pg';
 import cors from 'cors';
@@ -17,15 +18,8 @@ const pool = new Pool({
   }
 });
 
-// Ruta de prueba
-app.get('/', async (req, res) => {
-    fetch('https://backend-server-2efm.onrender.com/api/cschat')
-      .then(response => response.json())
-      .then(data => res.send(data))
-});
-
 // Ruta para obtener todos los mensajes
-app.get('/api/cschat', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM cschat ORDER BY id ASC');
     res.json(result.rows);
@@ -35,7 +29,7 @@ app.get('/api/cschat', async (req, res) => {
   }
 });
 // Ruta para añadir un nuevo mensaje
-app.post('/api/cschat', async (req, res) => {
+app.post('/', async (req, res) => {
   const { user, message } = req.body;
   try {
     const result = await pool.query(
@@ -49,6 +43,33 @@ app.post('/api/cschat', async (req, res) => {
   }
 });
 
+
+app.delete('/:id', async (req, res) => {
+  // Extraer el ID del mensaje de los parámetros de la URL
+  const { id } = req.params;
+
+  try {
+    // Ejecutar la consulta SQL DELETE
+    const result = await pool.query('DELETE FROM cschat WHERE id = $1 RETURNING *', [id]);
+
+    // Verificar si se eliminó alguna fila
+    if (result.rowCount > 0) {
+      // Si se eliminó correctamente, responder con el elemento eliminado
+      res.json({
+        message: `Mensaje con ID ${id} eliminado exitosamente`,
+        deletedMessage: result.rows[0]
+      });
+    } else {
+      // Si no se encontró el ID, responder con estado 404 Not Found
+      res.status(404).send(`No se encontró el mensaje con ID ${id}`);
+    }
+
+  } catch (err) {
+    console.error(err);
+    // Manejar errores del servidor
+    res.status(500).send('Error del servidor al intentar eliminar el mensaje');
+  }
+});
 
 // Iniciar el servidor
 app.listen(port, () => {
